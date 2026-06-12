@@ -1,5 +1,30 @@
 export type TaskStatus = 'not_started' | 'in_progress' | 'done'
 export type TaskPriority = 'low' | 'medium' | 'high'
+export type GoalStatus = 'not_started' | 'in_progress' | 'done'
+
+export interface Goal {
+  id: string
+  title: string
+  deadline: string | null
+  status: GoalStatus
+  archived_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface GoalInput {
+  title: string
+  deadline: string | null
+  status: GoalStatus
+}
+
+export interface Milestone {
+  id: string
+  goal_id: string
+  title: string
+  sort_order: number
+  created_at: string
+}
 
 export interface Project {
   id: string
@@ -29,6 +54,16 @@ export interface TaskInput {
   priority: TaskPriority
   status: TaskStatus
   project_id: string | null
+  goal_id?: string | null
+  milestone_id?: string | null
+}
+
+/** Progress % for a goal: completed tasks / all tasks under it. */
+export function goalProgress(goalId: string, tasks: Task[]): { done: number; total: number; pct: number } {
+  const under = tasks.filter((t) => t.goal_id === goalId)
+  const done = under.filter((t) => t.status === 'done').length
+  const total = under.length
+  return { done, total, pct: total === 0 ? 0 : Math.round((done / total) * 100) }
 }
 
 /** Local YYYY-MM-DD (matches Postgres `date` column, avoids UTC off-by-one). */
