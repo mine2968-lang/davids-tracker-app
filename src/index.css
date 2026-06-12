@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+/* Keep the area behind the iOS status bar / notch the same dark color */
+html {
+  background-color: #0f172a;
+}

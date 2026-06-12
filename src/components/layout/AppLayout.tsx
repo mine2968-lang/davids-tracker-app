@@ -57,7 +57,10 @@ export default function AppLayout({ active, onNavigate, children }: Props) {
   const { user, signOut } = useAuth()
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white md:flex">
+    <div
+      className="min-h-screen bg-slate-900 text-white md:flex"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       {/* Sidebar — Mac / wide screens */}
       <aside className="hidden md:flex md:flex-col md:w-56 md:shrink-0 border-r border-slate-800 p-4 md:sticky md:top-0 md:h-screen">
         <h1 className="text-lg font-bold px-3 mb-6">David's Tracker</h1>
