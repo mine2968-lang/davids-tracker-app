@@ -9,7 +9,7 @@ interface Props {
 }
 
 const inputCls =
-  'w-full rounded-lg bg-slate-700 text-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500'
+  'w-full min-w-0 appearance-none rounded-lg bg-slate-700 text-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500'
 
 export default function GoalForm({ initial, onSubmit, onCancel }: Props) {
   const [title, setTitle] = useState(initial?.title ?? '')
@@ -43,7 +43,7 @@ export default function GoalForm({ initial, onSubmit, onCancel }: Props) {
       />
 
       <div className="grid grid-cols-2 gap-3">
-        <div>
+        <div className="min-w-0">
           <label className="block text-xs text-slate-400 mb-1">Deadline</label>
           <input
             type="date"
@@ -52,7 +52,7 @@ export default function GoalForm({ initial, onSubmit, onCancel }: Props) {
             className={inputCls}
           />
         </div>
-        <div>
+        <div className="min-w-0">
           <label className="block text-xs text-slate-400 mb-1">Status</label>
           <select
             value={status}

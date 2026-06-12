@@ -11,7 +11,7 @@ interface Props {
 }
 
 const inputCls =
-  'w-full rounded-lg bg-slate-700 text-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500'
+  'w-full min-w-0 appearance-none rounded-lg bg-slate-700 text-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500'
 
 export default function TaskForm({ initial, projects, onSubmit, onCancel, onCreateProject }: Props) {
   const [title, setTitle] = useState(initial?.title ?? '')
@@ -67,7 +67,7 @@ export default function TaskForm({ initial, projects, onSubmit, onCancel, onCrea
       />
 
       <div className="grid grid-cols-2 gap-3">
-        <div>
+        <div className="min-w-0">
           <label className="block text-xs text-slate-400 mb-1">Due date</label>
           <input
             type="date"
@@ -76,7 +76,7 @@ export default function TaskForm({ initial, projects, onSubmit, onCancel, onCrea
             className={inputCls}
           />
         </div>
-        <div>
+        <div className="min-w-0">
           <label className="block text-xs text-slate-400 mb-1">Priority</label>
           <select
             value={priority}
@@ -88,7 +88,7 @@ export default function TaskForm({ initial, projects, onSubmit, onCancel, onCrea
             <option value="high">High</option>
           </select>
         </div>
-        <div>
+        <div className="min-w-0">
           <label className="block text-xs text-slate-400 mb-1">Status</label>
           <select
             value={status}
@@ -100,7 +100,7 @@ export default function TaskForm({ initial, projects, onSubmit, onCancel, onCrea
             <option value="done">Done</option>
           </select>
         </div>
-        <div>
+        <div className="min-w-0">
           <label className="block text-xs text-slate-400 mb-1">Project</label>
           <select
             value={projectId ?? ''}
