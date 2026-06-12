@@ -1,25 +1,29 @@
+import { useState } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { useAuth } from './contexts/auth-context'
 import LoginScreen from './components/LoginScreen'
+import AppLayout from './components/layout/AppLayout'
+import type { TabId } from './components/layout/AppLayout'
+import HomeView from './views/HomeView'
+import TasksView from './views/TasksView'
+import PlaceholderView from './views/PlaceholderView'
+import { useTasks } from './hooks/useTasks'
+import { useProjects } from './hooks/useProjects'
 
 function Shell() {
-  const { user, signOut } = useAuth()
+  const [tab, setTab] = useState<TabId>('home')
+  const tasksApi = useTasks()
+  const projectsApi = useProjects()
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center gap-4 px-4">
-      <h1 className="text-2xl font-bold">Signed in</h1>
-      <p className="text-slate-400">{user?.email}</p>
-      <p className="text-slate-500 text-sm text-center max-w-xs">
-        Phase 0 complete. Tasks, Goals, and Notes arrive in the next phases.
-      </p>
-      <button
-        type="button"
-        onClick={signOut}
-        className="rounded-lg bg-slate-700 hover:bg-slate-600 px-4 py-2 text-sm transition-colors"
-      >
-        Sign out
-      </button>
-    </div>
+    <AppLayout active={tab} onNavigate={setTab}>
+      {tab === 'home' && (
+        <HomeView tasksApi={tasksApi} projectsApi={projectsApi} onGoToTasks={() => setTab('tasks')} />
+      )}
+      {tab === 'tasks' && <TasksView tasksApi={tasksApi} projectsApi={projectsApi} />}
+      {tab === 'goals' && <PlaceholderView title="Goals" phase="Phase 2" />}
+      {tab === 'notes' && <PlaceholderView title="Notes" phase="Phase 3" />}
+    </AppLayout>
   )
 }
 
