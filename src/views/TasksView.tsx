@@ -94,9 +94,17 @@ export default function TasksView({ tasksApi, projectsApi }: Props) {
             <button
               type="button"
               onClick={() => setManagingProjects((v) => !v)}
-              className="text-xs text-slate-500 hover:text-white transition-colors"
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors ${
+                managingProjects
+                  ? 'bg-indigo-500/15 border-indigo-500/40 text-indigo-300'
+                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
+              }`}
             >
-              {managingProjects ? 'Done managing' : 'Manage projects'}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
+                <path d="M10.3 4.3a1 1 0 0 1 .94-.66h1.52a1 1 0 0 1 .94.66l.3.83a1 1 0 0 0 .56.57l.84.34a1 1 0 0 0 .8 0l.82-.35a1 1 0 0 1 1.13.27l1.07 1.07a1 1 0 0 1 .27 1.13l-.35.82a1 1 0 0 0 0 .8l.34.84a1 1 0 0 0 .57.56l.83.3a1 1 0 0 1 .66.94v1.52a1 1 0 0 1-.66.94l-.83.3a1 1 0 0 0-.57.56l-.34.84a1 1 0 0 0 0 .8l.35.82a1 1 0 0 1-.27 1.13l-1.07 1.07a1 1 0 0 1-1.13.27l-.82-.35a1 1 0 0 0-.8 0l-.84.34a1 1 0 0 0-.56.57l-.3.83a1 1 0 0 1-.94.66h-1.52a1 1 0 0 1-.94-.66l-.3-.83a1 1 0 0 0-.56-.57l-.84-.34a1 1 0 0 0-.8 0l-.82.35a1 1 0 0 1-1.13-.27l-1.07-1.07a1 1 0 0 1-.27-1.13l.35-.82a1 1 0 0 0 0-.8l-.34-.84a1 1 0 0 0-.57-.56l-.83-.3a1 1 0 0 1-.66-.94v-1.52a1 1 0 0 1 .66-.94l.83-.3a1 1 0 0 0 .57-.56l.34-.84a1 1 0 0 0 0-.8l-.35-.82a1 1 0 0 1 .27-1.13l1.07-1.07a1 1 0 0 1 1.13-.27l.82.35a1 1 0 0 0 .8 0l.84-.34a1 1 0 0 0 .56-.57z" strokeLinejoin="round" />
+                <circle cx="12" cy="12" r="2.5" />
+              </svg>
+              {managingProjects ? 'Done' : 'Manage projects'}
             </button>
           )}
           {managingProjects && (
