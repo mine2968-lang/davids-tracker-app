@@ -183,8 +183,18 @@ export default function TasksView({ tasksApi, projectsApi }: Props) {
         <button
           type="button"
           onClick={() => setShowDone(!showDone)}
-          className="text-xs text-slate-500 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
         >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
+            {showDone ? (
+              <path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.4 5.2A9.5 9.5 0 0 1 12 5c5 0 9 4.5 9 7a12 12 0 0 1-2.2 3M6.2 6.2A12.6 12.6 0 0 0 3 12c0 2.5 4 7 9 7a9.6 9.6 0 0 0 3.4-.6" strokeLinecap="round" strokeLinejoin="round" />
+            ) : (
+              <>
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="12" cy="12" r="3" />
+              </>
+            )}
+          </svg>
           {showDone ? 'Hide' : 'Show'} {doneCount} completed
         </button>
       )}
