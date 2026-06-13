@@ -41,9 +41,10 @@ export function useTasks() {
       .insert(input)
       .select()
       .single()
-    if (err) return { error: err.message }
-    setTasks((prev) => [data as Task, ...prev])
-    return { error: null }
+    if (err) return { task: null, error: err.message }
+    const task = data as Task
+    setTasks((prev) => [task, ...prev])
+    return { task, error: null }
   }, [])
 
   const updateTask = useCallback(async (id: string, patch: Partial<TaskInput>) => {

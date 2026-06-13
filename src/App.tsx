@@ -4,19 +4,24 @@ import { useAuth } from './contexts/auth-context'
 import LoginScreen from './components/LoginScreen'
 import AppLayout from './components/layout/AppLayout'
 import type { TabId } from './components/layout/AppLayout'
+import QuickCapture from './components/QuickCapture'
 import HomeView from './views/HomeView'
 import TasksView from './views/TasksView'
 import GoalsView from './views/GoalsView'
-import PlaceholderView from './views/PlaceholderView'
+import NotesView from './views/NotesView'
 import { useTasks } from './hooks/useTasks'
 import { useProjects } from './hooks/useProjects'
 import { useGoals } from './hooks/useGoals'
+import { useNotes } from './hooks/useNotes'
+import { useTags } from './hooks/useTags'
 
 function Shell() {
   const [tab, setTab] = useState<TabId>('home')
   const tasksApi = useTasks()
   const projectsApi = useProjects()
   const goalsApi = useGoals()
+  const notesApi = useNotes()
+  const tagsApi = useTags()
 
   return (
     <AppLayout active={tab} onNavigate={setTab}>
@@ -33,7 +38,17 @@ function Shell() {
       {tab === 'goals' && (
         <GoalsView goalsApi={goalsApi} tasksApi={tasksApi} projectsApi={projectsApi} />
       )}
-      {tab === 'notes' && <PlaceholderView title="Notes" phase="Phase 3" />}
+      {tab === 'notes' && (
+        <NotesView
+          notesApi={notesApi}
+          tagsApi={tagsApi}
+          goalsApi={goalsApi}
+          tasksApi={tasksApi}
+          onGoToGoals={() => setTab('goals')}
+          onGoToTasks={() => setTab('tasks')}
+        />
+      )}
+      <QuickCapture onSave={notesApi.addNote} />
     </AppLayout>
   )
 }

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Keep the area behind the iOS status bar / notch the same dark color */
 html {

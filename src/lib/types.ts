@@ -26,6 +26,41 @@ export interface Milestone {
   created_at: string
 }
 
+export interface Note {
+  id: string
+  title: string
+  body: string
+  is_markdown: boolean
+  linked_goal_id: string | null
+  linked_task_id: string | null
+  archived_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface NoteInput {
+  title: string
+  body: string
+  is_markdown: boolean
+  linked_goal_id?: string | null
+  linked_task_id?: string | null
+}
+
+export interface Tag {
+  id: string
+  name: string
+  created_at: string
+}
+
+/** Joins one tag to exactly one of goal/task/note. */
+export interface ItemTag {
+  id: string
+  tag_id: string
+  goal_id: string | null
+  task_id: string | null
+  note_id: string | null
+}
+
 export interface Project {
   id: string
   name: string

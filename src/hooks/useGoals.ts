@@ -40,9 +40,10 @@ export function useGoals() {
 
   const addGoal = useCallback(async (input: GoalInput) => {
     const { data, error: err } = await supabase.from('goals').insert(input).select().single()
-    if (err) return { error: err.message }
-    setGoals((prev) => [data as Goal, ...prev])
-    return { error: null }
+    if (err) return { goal: null, error: err.message }
+    const goal = data as Goal
+    setGoals((prev) => [goal, ...prev])
+    return { goal, error: null }
   }, [])
 
   const updateGoal = useCallback(async (id: string, patch: Partial<GoalInput>) => {
