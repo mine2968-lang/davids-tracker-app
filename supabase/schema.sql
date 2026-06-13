@@ -65,6 +65,19 @@ create table if not exists notes (
   updated_at     timestamptz not null default now()
 );
 
+-- Folders group a goal's linked notes (see migration 001).
+create table if not exists note_folders (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  goal_id    uuid not null references goals (id) on delete cascade,
+  name       text not null,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table notes
+  add column if not exists folder_id uuid references note_folders (id) on delete set null;
+
 -- Shared tag pool across goals/tasks/notes.
 create table if not exists tags (
   id         uuid primary key default gen_random_uuid(),
@@ -96,6 +109,9 @@ create index if not exists idx_projects_user   on projects (user_id);
 create index if not exists idx_goals_user      on goals (user_id);
 create index if not exists idx_milestones_user on milestones (user_id);
 create index if not exists idx_milestones_goal on milestones (goal_id);
+create index if not exists idx_note_folders_user on note_folders (user_id);
+create index if not exists idx_note_folders_goal on note_folders (goal_id);
+create index if not exists idx_notes_folder      on notes (folder_id);
 create index if not exists idx_tasks_user      on tasks (user_id);
 create index if not exists idx_tasks_goal      on tasks (goal_id);
 create index if not exists idx_tasks_milestone on tasks (milestone_id);
@@ -138,15 +154,16 @@ alter table projects   enable row level security;
 alter table goals      enable row level security;
 alter table milestones enable row level security;
 alter table tasks      enable row level security;
-alter table notes      enable row level security;
-alter table tags       enable row level security;
-alter table item_tags  enable row level security;
+alter table notes        enable row level security;
+alter table note_folders enable row level security;
+alter table tags         enable row level security;
+alter table item_tags    enable row level security;
 
 do $$
 declare
   t text;
 begin
-  foreach t in array array['projects', 'goals', 'milestones', 'tasks', 'notes', 'tags', 'item_tags']
+  foreach t in array array['projects', 'goals', 'milestones', 'tasks', 'notes', 'note_folders', 'tags', 'item_tags']
   loop
     execute format('drop policy if exists "owner_select" on %I', t);
     execute format('drop policy if exists "owner_insert" on %I', t);

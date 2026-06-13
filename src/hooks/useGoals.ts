@@ -1,27 +1,30 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import type { Goal, GoalInput, Milestone } from '../lib/types'
+import type { Goal, GoalInput, Milestone, NoteFolder } from '../lib/types'
 
 export function useGoals() {
   const [goals, setGoals] = useState<Goal[]>([])
   const [milestones, setMilestones] = useState<Milestone[]>([])
+  const [folders, setFolders] = useState<NoteFolder[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    const [goalsRes, milestonesRes] = await Promise.all([
+    const [goalsRes, milestonesRes, foldersRes] = await Promise.all([
       supabase
         .from('goals')
         .select('*')
         .is('archived_at', null)
         .order('created_at', { ascending: false }),
       supabase.from('milestones').select('*').order('sort_order').order('created_at'),
+      supabase.from('note_folders').select('*').order('sort_order').order('created_at'),
     ])
     if (goalsRes.error || milestonesRes.error) {
       setError(goalsRes.error?.message ?? milestonesRes.error?.message ?? null)
     } else {
       setGoals(goalsRes.data as Goal[])
       setMilestones(milestonesRes.data as Milestone[])
+      if (!foldersRes.error) setFolders(foldersRes.data as NoteFolder[])
       setError(null)
     }
     setLoading(false)
@@ -100,9 +103,46 @@ export function useGoals() {
     return { error: null }
   }, [])
 
+  const addFolder = useCallback(
+    async (goalId: string, name: string) => {
+      const sortOrder = folders.filter((f) => f.goal_id === goalId).length
+      const { data, error: err } = await supabase
+        .from('note_folders')
+        .insert({ goal_id: goalId, name, sort_order: sortOrder })
+        .select()
+        .single()
+      if (err) return { folder: null, error: err.message }
+      const folder = data as NoteFolder
+      setFolders((prev) => [...prev, folder])
+      return { folder, error: null }
+    },
+    [folders]
+  )
+
+  const renameFolder = useCallback(async (id: string, name: string) => {
+    const { data, error: err } = await supabase
+      .from('note_folders')
+      .update({ name })
+      .eq('id', id)
+      .select()
+      .single()
+    if (err) return { error: err.message }
+    setFolders((prev) => prev.map((f) => (f.id === id ? (data as NoteFolder) : f)))
+    return { error: null }
+  }, [])
+
+  const deleteFolder = useCallback(async (id: string) => {
+    // FK is on delete set null, so notes survive and fall back to "no folder".
+    const { error: err } = await supabase.from('note_folders').delete().eq('id', id)
+    if (err) return { error: err.message }
+    setFolders((prev) => prev.filter((f) => f.id !== id))
+    return { error: null }
+  }, [])
+
   return {
     goals,
     milestones,
+    folders,
     loading,
     error,
     refresh,
@@ -112,5 +152,8 @@ export function useGoals() {
     addMilestone,
     renameMilestone,
     deleteMilestone,
+    addFolder,
+    renameFolder,
+    deleteFolder,
   }
 }

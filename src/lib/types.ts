@@ -33,6 +33,7 @@ export interface Note {
   is_markdown: boolean
   linked_goal_id: string | null
   linked_task_id: string | null
+  folder_id: string | null
   archived_at: string | null
   created_at: string
   updated_at: string
@@ -44,6 +45,16 @@ export interface NoteInput {
   is_markdown: boolean
   linked_goal_id?: string | null
   linked_task_id?: string | null
+  folder_id?: string | null
+}
+
+/** A folder groups a goal's linked notes. */
+export interface NoteFolder {
+  id: string
+  goal_id: string
+  name: string
+  sort_order: number
+  created_at: string
 }
 
 export interface Tag {

@@ -17,11 +17,17 @@ import { useTags } from './hooks/useTags'
 
 function Shell() {
   const [tab, setTab] = useState<TabId>('home')
+  const [openNoteId, setOpenNoteId] = useState<string | null>(null)
   const tasksApi = useTasks()
   const projectsApi = useProjects()
   const goalsApi = useGoals()
   const notesApi = useNotes()
   const tagsApi = useTags()
+
+  const openNote = (noteId: string) => {
+    setOpenNoteId(noteId)
+    setTab('notes')
+  }
 
   return (
     <AppLayout active={tab} onNavigate={setTab}>
@@ -36,7 +42,13 @@ function Shell() {
       )}
       {tab === 'tasks' && <TasksView tasksApi={tasksApi} projectsApi={projectsApi} />}
       {tab === 'goals' && (
-        <GoalsView goalsApi={goalsApi} tasksApi={tasksApi} projectsApi={projectsApi} />
+        <GoalsView
+          goalsApi={goalsApi}
+          tasksApi={tasksApi}
+          projectsApi={projectsApi}
+          notesApi={notesApi}
+          onOpenNote={openNote}
+        />
       )}
       {tab === 'notes' && (
         <NotesView
@@ -44,6 +56,8 @@ function Shell() {
           tagsApi={tagsApi}
           goalsApi={goalsApi}
           tasksApi={tasksApi}
+          openNoteId={openNoteId}
+          onConsumeOpenNote={() => setOpenNoteId(null)}
           onGoToGoals={() => setTab('goals')}
           onGoToTasks={() => setTab('tasks')}
         />

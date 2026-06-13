@@ -16,13 +16,30 @@ interface Props {
   onGoToTasks: () => void
 }
 
+interface NotesViewProps extends Props {
+  /** When set (e.g. opened from a goal), jump straight into this note. */
+  openNoteId?: string | null
+  onConsumeOpenNote?: () => void
+}
+
 const inputCls =
   'w-full min-w-0 rounded-lg bg-slate-700 text-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500'
 
-export default function NotesView(props: Props) {
+export default function NotesView({ openNoteId, onConsumeOpenNote, ...props }: NotesViewProps) {
   const { notesApi } = props
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
+  // React's "adjust state when a prop changes" pattern: compare against the
+  // last request we acted on. A note opened from another tab (e.g. a goal's
+  // note list) selects it here, once per distinct request.
+  const [lastOpenReq, setLastOpenReq] = useState<string | null>(null)
+
+  if (openNoteId && openNoteId !== lastOpenReq) {
+    setLastOpenReq(openNoteId)
+    setSelectedId(openNoteId)
+    setCreating(false)
+    if (onConsumeOpenNote) queueMicrotask(onConsumeOpenNote)
+  }
 
   const selected = notesApi.notes.find((n) => n.id === selectedId)
 
