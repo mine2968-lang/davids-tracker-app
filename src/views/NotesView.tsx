@@ -368,37 +368,74 @@ function NoteDetail({
         </form>
       </div>
 
-      <div className="bg-slate-800 rounded-xl p-4 space-y-2">
-        <h3 className="text-sm font-semibold text-slate-300">Turn this idea into…</h3>
+      <div className="bg-slate-800 rounded-xl p-4 space-y-3">
+        <h3 className="text-sm font-semibold text-slate-300">Goal & task links</h3>
+
         {linkedGoal ? (
-          <button
-            type="button"
-            onClick={onGoToGoals}
-            className="block text-sm text-emerald-400 hover:text-emerald-300"
-          >
-            → Spawned goal: {linkedGoal.title}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onGoToGoals}
+              className="text-sm text-emerald-400 hover:text-emerald-300 truncate"
+            >
+              → Goal: {linkedGoal.title}
+            </button>
+            <button
+              type="button"
+              onClick={() => notesApi.updateNote(note.id, { linked_goal_id: null })}
+              className="text-xs text-slate-500 hover:text-red-400 shrink-0"
+            >
+              unlink
+            </button>
+          </div>
         ) : (
-          !note.linked_goal_id && (
+          <div className="flex gap-2 flex-wrap items-center">
             <button
               type="button"
               onClick={convertToGoal}
-              className="rounded-lg bg-slate-700 hover:bg-slate-600 px-3 py-1.5 text-sm mr-2 transition-colors"
+              className="rounded-lg bg-slate-700 hover:bg-slate-600 px-3 py-1.5 text-sm transition-colors"
             >
               Convert → Goal
             </button>
-          )
+            {goalsApi.goals.length > 0 && (
+              <select
+                value=""
+                onChange={(e) => {
+                  if (e.target.value)
+                    notesApi.updateNote(note.id, { linked_goal_id: e.target.value })
+                }}
+                className="rounded-lg bg-slate-700 text-sm text-slate-300 px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-500 max-w-48"
+              >
+                <option value="">Add to existing goal…</option>
+                {goalsApi.goals.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.title}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
         )}
+
         {linkedTask ? (
-          <button
-            type="button"
-            onClick={onGoToTasks}
-            className="block text-sm text-sky-400 hover:text-sky-300"
-          >
-            → Spawned task: {linkedTask.title}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onGoToTasks}
+              className="text-sm text-sky-400 hover:text-sky-300 truncate"
+            >
+              → Task: {linkedTask.title}
+            </button>
+            <button
+              type="button"
+              onClick={() => notesApi.updateNote(note.id, { linked_task_id: null })}
+              className="text-xs text-slate-500 hover:text-red-400 shrink-0"
+            >
+              unlink
+            </button>
+          </div>
         ) : (
-          !note.linked_task_id && (
+          <div className="flex gap-2 flex-wrap items-center">
             <button
               type="button"
               onClick={convertToTask}
@@ -406,11 +443,30 @@ function NoteDetail({
             >
               Convert → Task
             </button>
-          )
+            {tasksApi.tasks.length > 0 && (
+              <select
+                value=""
+                onChange={(e) => {
+                  if (e.target.value)
+                    notesApi.updateNote(note.id, { linked_task_id: e.target.value })
+                }}
+                className="rounded-lg bg-slate-700 text-sm text-slate-300 px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-500 max-w-48"
+              >
+                <option value="">Add to existing task…</option>
+                {tasksApi.tasks.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.title}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
         )}
+
         {convertError && <p className="text-sm text-red-400">{convertError}</p>}
         <p className="text-[11px] text-slate-500">
-          The note stays — it just links to what it spawned.
+          Convert makes a new goal/task from this note; “Add to existing” links it to one you
+          already have. The note stays either way.
         </p>
       </div>
     </div>
