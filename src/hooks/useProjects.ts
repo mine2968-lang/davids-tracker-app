@@ -32,5 +32,13 @@ export function useProjects() {
     return { project, error: null }
   }, [])
 
-  return { projects, refresh, addProject }
+  const deleteProject = useCallback(async (id: string) => {
+    // FK is on delete set null, so tasks survive and fall back to "No project".
+    const { error } = await supabase.from('projects').delete().eq('id', id)
+    if (error) return { error: error.message }
+    setProjects((prev) => prev.filter((p) => p.id !== id))
+    return { error: null }
+  }, [])
+
+  return { projects, refresh, addProject, deleteProject }
 }

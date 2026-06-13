@@ -11,12 +11,27 @@ interface Props {
 }
 
 export default function TasksView({ tasksApi, projectsApi }: Props) {
-  const { tasks, loading, error, addTask, updateTask, deleteTask } = tasksApi
-  const { projects, addProject } = projectsApi
+  const { tasks, loading, error, addTask, updateTask, deleteTask, refresh: refreshTasks } = tasksApi
+  const { projects, addProject, deleteProject } = projectsApi
   const [adding, setAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [projectFilter, setProjectFilter] = useState<string>('all')
   const [showDone, setShowDone] = useState(false)
+  const [managingProjects, setManagingProjects] = useState(false)
+
+  const handleDeleteProject = async (id: string, name: string) => {
+    const count = tasks.filter((t) => t.project_id === id).length
+    const msg = count
+      ? `Delete project "${name}"? Its ${count} task${count > 1 ? 's' : ''} stay but become "No project".`
+      : `Delete project "${name}"?`
+    if (!confirm(msg)) return
+    const { error: err } = await deleteProject(id)
+    if (!err) {
+      if (projectFilter === id) setProjectFilter('all')
+      // Tasks that referenced this project had project_id nulled server-side.
+      refreshTasks()
+    }
+  }
 
   const filtered = useMemo(() => {
     let list = tasks
@@ -69,10 +84,37 @@ export default function TasksView({ tasksApi, projectsApi }: Props) {
       </div>
 
       {(projects.length > 0 || tasks.some((t) => !t.project_id)) && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {filterChip('all', 'All')}
-          {projects.map((p) => filterChip(p.id, p.name))}
-          {filterChip('none', 'No project')}
+        <div className="space-y-2">
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {filterChip('all', 'All')}
+            {projects.map((p) => filterChip(p.id, p.name))}
+            {filterChip('none', 'No project')}
+          </div>
+          {projects.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setManagingProjects((v) => !v)}
+              className="text-xs text-slate-500 hover:text-white transition-colors"
+            >
+              {managingProjects ? 'Done managing' : 'Manage projects'}
+            </button>
+          )}
+          {managingProjects && (
+            <div className="space-y-1.5 bg-slate-800 rounded-xl p-3">
+              {projects.map((p) => (
+                <div key={p.id} className="flex items-center justify-between gap-2">
+                  <span className="text-sm truncate">{p.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteProject(p.id, p.name)}
+                    className="shrink-0 text-xs text-slate-500 hover:text-red-400 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
