@@ -21,11 +21,14 @@ export default function HomeView({ tasksApi, projectsApi, goalsApi, onGoToTasks,
   const activeGoals = goalsApi.goals.filter((g) => g.status !== 'done')
 
   const today = todayStr()
-  const { overdue, dueToday } = useMemo(() => {
+  const { overdue, dueToday, upcoming } = useMemo(() => {
     const open = tasks.filter((t) => t.status !== 'done' && t.due_date)
     return {
       overdue: open.filter((t) => t.due_date! < today),
       dueToday: open.filter((t) => t.due_date === today),
+      upcoming: open
+        .filter((t) => t.due_date! > today)
+        .sort((a, b) => a.due_date!.localeCompare(b.due_date!)),
     }
   }, [tasks, today])
 
@@ -69,7 +72,8 @@ export default function HomeView({ tasksApi, projectsApi, goalsApi, onGoToTasks,
         <>
           {section('Overdue', overdue, 'text-red-400')}
           {section('Due today', dueToday, 'text-indigo-300')}
-          {overdue.length === 0 && dueToday.length === 0 && (
+          {section('Upcoming', upcoming, 'text-emerald-300')}
+          {overdue.length === 0 && dueToday.length === 0 && upcoming.length === 0 && (
             <p className="text-slate-500 text-sm">All clear — nothing due.</p>
           )}
 
