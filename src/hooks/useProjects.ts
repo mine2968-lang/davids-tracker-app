@@ -32,6 +32,20 @@ export function useProjects() {
     return { project, error: null }
   }, [])
 
+  const updateProject = useCallback(async (id: string, name: string) => {
+    const { data, error } = await supabase
+      .from('projects')
+      .update({ name })
+      .eq('id', id)
+      .select()
+      .single()
+    if (error) return { error: error.message }
+    setProjects((prev) =>
+      prev.map((p) => (p.id === id ? (data as Project) : p)).sort((a, b) => a.name.localeCompare(b.name))
+    )
+    return { error: null }
+  }, [])
+
   const deleteProject = useCallback(async (id: string) => {
     // FK is on delete set null, so tasks survive and fall back to "No project".
     const { error } = await supabase.from('projects').delete().eq('id', id)
@@ -40,5 +54,5 @@ export function useProjects() {
     return { error: null }
   }, [])
 
-  return { projects, refresh, addProject, deleteProject }
+  return { projects, refresh, addProject, updateProject, deleteProject }
 }

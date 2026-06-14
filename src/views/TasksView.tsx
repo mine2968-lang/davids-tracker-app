@@ -11,27 +11,12 @@ interface Props {
 }
 
 export default function TasksView({ tasksApi, projectsApi }: Props) {
-  const { tasks, loading, error, addTask, updateTask, deleteTask, refresh: refreshTasks } = tasksApi
-  const { projects, addProject, deleteProject } = projectsApi
+  const { tasks, loading, error, addTask, updateTask, deleteTask } = tasksApi
+  const { projects, addProject } = projectsApi
   const [adding, setAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [projectFilter, setProjectFilter] = useState<string>('all')
   const [showDone, setShowDone] = useState(false)
-  const [managingProjects, setManagingProjects] = useState(false)
-
-  const handleDeleteProject = async (id: string, name: string) => {
-    const count = tasks.filter((t) => t.project_id === id).length
-    const msg = count
-      ? `Delete project "${name}"? Its ${count} task${count > 1 ? 's' : ''} stay but become "No project".`
-      : `Delete project "${name}"?`
-    if (!confirm(msg)) return
-    const { error: err } = await deleteProject(id)
-    if (!err) {
-      if (projectFilter === id) setProjectFilter('all')
-      // Tasks that referenced this project had project_id nulled server-side.
-      refreshTasks()
-    }
-  }
 
   const filtered = useMemo(() => {
     let list = tasks
@@ -84,45 +69,10 @@ export default function TasksView({ tasksApi, projectsApi }: Props) {
       </div>
 
       {(projects.length > 0 || tasks.some((t) => !t.project_id)) && (
-        <div className="space-y-2">
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {filterChip('all', 'All')}
-            {projects.map((p) => filterChip(p.id, p.name))}
-            {filterChip('none', 'No project')}
-          </div>
-          {projects.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setManagingProjects((v) => !v)}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-colors ${
-                managingProjects
-                  ? 'bg-indigo-500/15 border-indigo-500/40 text-indigo-300'
-                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
-              }`}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
-                <path d="M10.3 4.3a1 1 0 0 1 .94-.66h1.52a1 1 0 0 1 .94.66l.3.83a1 1 0 0 0 .56.57l.84.34a1 1 0 0 0 .8 0l.82-.35a1 1 0 0 1 1.13.27l1.07 1.07a1 1 0 0 1 .27 1.13l-.35.82a1 1 0 0 0 0 .8l.34.84a1 1 0 0 0 .57.56l.83.3a1 1 0 0 1 .66.94v1.52a1 1 0 0 1-.66.94l-.83.3a1 1 0 0 0-.57.56l-.34.84a1 1 0 0 0 0 .8l.35.82a1 1 0 0 1-.27 1.13l-1.07 1.07a1 1 0 0 1-1.13.27l-.82-.35a1 1 0 0 0-.8 0l-.84.34a1 1 0 0 0-.56.57l-.3.83a1 1 0 0 1-.94.66h-1.52a1 1 0 0 1-.94-.66l-.3-.83a1 1 0 0 0-.56-.57l-.84-.34a1 1 0 0 0-.8 0l-.82.35a1 1 0 0 1-1.13-.27l-1.07-1.07a1 1 0 0 1-.27-1.13l.35-.82a1 1 0 0 0 0-.8l-.34-.84a1 1 0 0 0-.57-.56l-.83-.3a1 1 0 0 1-.66-.94v-1.52a1 1 0 0 1 .66-.94l.83-.3a1 1 0 0 0 .57-.56l.34-.84a1 1 0 0 0 0-.8l-.35-.82a1 1 0 0 1 .27-1.13l1.07-1.07a1 1 0 0 1 1.13-.27l.82.35a1 1 0 0 0 .8 0l.84-.34a1 1 0 0 0 .56-.57z" strokeLinejoin="round" />
-                <circle cx="12" cy="12" r="2.5" />
-              </svg>
-              {managingProjects ? 'Done' : 'Manage projects'}
-            </button>
-          )}
-          {managingProjects && (
-            <div className="space-y-1.5 bg-slate-800 rounded-xl p-3">
-              {projects.map((p) => (
-                <div key={p.id} className="flex items-center justify-between gap-2">
-                  <span className="text-sm truncate">{p.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteProject(p.id, p.name)}
-                    className="shrink-0 text-xs text-slate-500 hover:text-red-400 transition-colors"
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {filterChip('all', 'All')}
+          {projects.map((p) => filterChip(p.id, p.name))}
+          {filterChip('none', 'No project')}
         </div>
       )}
 

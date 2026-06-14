@@ -8,6 +8,7 @@ import QuickCapture from './components/QuickCapture'
 import HomeView from './views/HomeView'
 import TasksView from './views/TasksView'
 import GoalsView from './views/GoalsView'
+import ProjectsView from './views/ProjectsView'
 import NotesView from './views/NotesView'
 import { useTasks } from './hooks/useTasks'
 import { useProjects } from './hooks/useProjects'
@@ -41,6 +42,7 @@ function Shell() {
         />
       )}
       {tab === 'tasks' && <TasksView tasksApi={tasksApi} projectsApi={projectsApi} />}
+      {tab === 'projects' && <ProjectsView projectsApi={projectsApi} tasksApi={tasksApi} />}
       {tab === 'goals' && (
         <GoalsView
           goalsApi={goalsApi}

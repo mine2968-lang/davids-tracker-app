@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useAuth } from '../../contexts/auth-context'
 
-export type TabId = 'home' | 'goals' | 'tasks' | 'notes'
+export type TabId = 'home' | 'goals' | 'tasks' | 'projects' | 'notes'
 
 const TABS: { id: TabId; label: string; icon: ReactNode }[] = [
   {
@@ -32,6 +32,15 @@ const TABS: { id: TabId; label: string; icon: ReactNode }[] = [
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
         <rect x="4" y="4" width="16" height="16" rx="3" />
         <path d="m9 12 2.5 2.5L15.5 9" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    id: 'projects',
+    label: 'Projects',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
+        <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -108,11 +117,11 @@ export default function AppLayout({ active, onNavigate, children }: Props) {
             key={tab.id}
             type="button"
             onClick={() => onNavigate(tab.id)}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[11px] ${
+            className={`flex-1 flex flex-col items-center gap-0.5 py-2 px-0.5 text-[10px] ${
               active === tab.id ? 'text-indigo-400' : 'text-slate-500'
             }`}
           >
-            {tab.icon}
+            <span className="[&_svg]:w-[22px] [&_svg]:h-[22px]">{tab.icon}</span>
             {tab.label}
           </button>
         ))}
