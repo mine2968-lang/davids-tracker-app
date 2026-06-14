@@ -67,7 +67,7 @@ export default function AppLayout({ active, onNavigate, children }: Props) {
 
   return (
     <div
-      className="min-h-screen bg-slate-900 text-white md:flex"
+      className="bg-slate-900 text-white md:flex md:min-h-screen"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Sidebar — Mac / wide screens */}
