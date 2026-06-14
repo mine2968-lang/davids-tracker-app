@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { useGoals } from '../hooks/useGoals'
 import type { useNotes } from '../hooks/useNotes'
+import type { useProjects } from '../hooks/useProjects'
 import type { useTags } from '../hooks/useTags'
 import type { useTasks } from '../hooks/useTasks'
 import type { Note } from '../lib/types'
@@ -12,8 +13,10 @@ interface Props {
   tagsApi: ReturnType<typeof useTags>
   goalsApi: ReturnType<typeof useGoals>
   tasksApi: ReturnType<typeof useTasks>
+  projectsApi: ReturnType<typeof useProjects>
   onGoToGoals: () => void
   onGoToTasks: () => void
+  onGoToProjects: () => void
 }
 
 interface NotesViewProps extends Props {
@@ -120,6 +123,11 @@ function NoteList({
                   {note.linked_task_id && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-400">
                       → task
+                    </span>
+                  )}
+                  {note.linked_project_id && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-400">
+                      → project
                     </span>
                   )}
                 </div>
@@ -236,8 +244,10 @@ function NoteDetail({
   tagsApi,
   goalsApi,
   tasksApi,
+  projectsApi,
   onGoToGoals,
   onGoToTasks,
+  onGoToProjects,
   onBack,
 }: Props & { note: Note; onBack: () => void }) {
   const [editing, setEditing] = useState(false)
@@ -247,6 +257,7 @@ function NoteDetail({
   const noteTags = tagsApi.tagsFor('note_id', note.id)
   const linkedGoal = goalsApi.goals.find((g) => g.id === note.linked_goal_id)
   const linkedTask = tasksApi.tasks.find((t) => t.id === note.linked_task_id)
+  const linkedProject = projectsApi.projects.find((p) => p.id === note.linked_project_id)
 
   if (editing) {
     return (
@@ -386,7 +397,7 @@ function NoteDetail({
       </div>
 
       <div className="bg-slate-800 rounded-xl p-4 space-y-3">
-        <h3 className="text-sm font-semibold text-slate-300">Goal & task links</h3>
+        <h3 className="text-sm font-semibold text-slate-300">Goal, task & project links</h3>
 
         {linkedGoal ? (
           <div className="flex items-center gap-2">
@@ -478,6 +489,45 @@ function NoteDetail({
               </select>
             )}
           </div>
+        )}
+
+        {linkedProject ? (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onGoToProjects}
+              className="text-sm text-indigo-400 hover:text-indigo-300 truncate"
+            >
+              → Project: {linkedProject.name}
+            </button>
+            <button
+              type="button"
+              onClick={() => notesApi.updateNote(note.id, { linked_project_id: null })}
+              className="text-xs text-slate-500 hover:text-red-400 shrink-0"
+            >
+              unlink
+            </button>
+          </div>
+        ) : (
+          projectsApi.projects.length > 0 && (
+            <div className="flex gap-2 flex-wrap items-center">
+              <select
+                value=""
+                onChange={(e) => {
+                  if (e.target.value)
+                    notesApi.updateNote(note.id, { linked_project_id: e.target.value })
+                }}
+                className="rounded-lg bg-slate-700 text-sm text-slate-300 px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-500 max-w-48"
+              >
+                <option value="">Add to a project…</option>
+                {projectsApi.projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )
         )}
 
         {convertError && <p className="text-sm text-red-400">{convertError}</p>}

@@ -14,6 +14,7 @@ import ProjectForm from '../components/ProjectForm'
 import Sortable from '../components/Sortable'
 import TaskForm from '../components/TaskForm'
 import TaskItem from '../components/TaskItem'
+import type { useNotes } from '../hooks/useNotes'
 import type { useProjects } from '../hooks/useProjects'
 import type { useTasks } from '../hooks/useTasks'
 import type { Project, ProjectStatus, Task } from '../lib/types'
@@ -22,6 +23,8 @@ import { projectProgress } from '../lib/types'
 interface Props {
   projectsApi: ReturnType<typeof useProjects>
   tasksApi: ReturnType<typeof useTasks>
+  notesApi: ReturnType<typeof useNotes>
+  onOpenNote: (noteId: string) => void
 }
 
 const STATUS_BADGE: Record<ProjectStatus, { label: string; cls: string }> = {
@@ -43,7 +46,7 @@ function Thumb({ url, size }: { url: string | null; size: string }) {
   )
 }
 
-export default function ProjectsView({ projectsApi, tasksApi }: Props) {
+export default function ProjectsView({ projectsApi, tasksApi, notesApi, onOpenNote }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = projectsApi.projects.find((p) => p.id === selectedId)
 
@@ -53,6 +56,8 @@ export default function ProjectsView({ projectsApi, tasksApi }: Props) {
         project={selected}
         projectsApi={projectsApi}
         tasksApi={tasksApi}
+        notesApi={notesApi}
+        onOpenNote={onOpenNote}
         onBack={() => setSelectedId(null)}
       />
     )
@@ -60,7 +65,11 @@ export default function ProjectsView({ projectsApi, tasksApi }: Props) {
   return <ProjectList projectsApi={projectsApi} tasksApi={tasksApi} onOpen={setSelectedId} />
 }
 
-function ProjectList({ projectsApi, tasksApi, onOpen }: Props & { onOpen: (id: string) => void }) {
+function ProjectList({
+  projectsApi,
+  tasksApi,
+  onOpen,
+}: Pick<Props, 'projectsApi' | 'tasksApi'> & { onOpen: (id: string) => void }) {
   const { projects, addProjectFull, reorderProjects } = projectsApi
   const [adding, setAdding] = useState(false)
 
@@ -155,11 +164,15 @@ function ProjectDetail({
   project,
   projectsApi,
   tasksApi,
+  notesApi,
+  onOpenNote,
   onBack,
 }: {
   project: Project
   projectsApi: ReturnType<typeof useProjects>
   tasksApi: ReturnType<typeof useTasks>
+  notesApi: ReturnType<typeof useNotes>
+  onOpenNote: (noteId: string) => void
   onBack: () => void
 }) {
   const { projects, addProject, updateProject, deleteProject } = projectsApi
@@ -168,6 +181,8 @@ function ProjectDetail({
   const [adding, setAdding] = useState(false)
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
   const [showDone, setShowDone] = useState(false)
+
+  const projectNotes = notesApi.notes.filter((n) => n.linked_project_id === project.id)
 
   const projectTasks = tasks
     .filter((t) => t.project_id === project.id)
@@ -370,6 +385,30 @@ function ProjectDetail({
           </button>
           {showDone && <div className="space-y-2">{doneTasks.map(renderTaskOrForm)}</div>}
         </>
+      )}
+
+      {projectNotes.length > 0 && (
+        <section className="space-y-2 border-t border-slate-800 pt-4">
+          <h3 className="text-sm font-semibold text-slate-300">Notes</h3>
+          {projectNotes.map((note) => (
+            <div key={note.id} className="flex items-center gap-2 bg-slate-800 rounded-lg px-3 py-2">
+              <button
+                type="button"
+                onClick={() => onOpenNote(note.id)}
+                className="min-w-0 flex-1 text-left text-sm truncate hover:text-indigo-300 transition-colors"
+              >
+                {note.title}
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenNote(note.id)}
+                className="shrink-0 text-xs text-indigo-400 hover:text-indigo-300"
+              >
+                Open →
+              </button>
+            </div>
+          ))}
+        </section>
       )}
     </div>
   )

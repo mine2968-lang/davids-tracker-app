@@ -34,6 +34,7 @@ export interface Note {
   is_markdown: boolean
   linked_goal_id: string | null
   linked_task_id: string | null
+  linked_project_id: string | null
   folder_id: string | null
   archived_at: string | null
   created_at: string
@@ -46,6 +47,7 @@ export interface NoteInput {
   is_markdown: boolean
   linked_goal_id?: string | null
   linked_task_id?: string | null
+  linked_project_id?: string | null
   folder_id?: string | null
 }
 

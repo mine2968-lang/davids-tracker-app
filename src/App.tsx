@@ -42,7 +42,14 @@ function Shell() {
         />
       )}
       {tab === 'tasks' && <TasksView tasksApi={tasksApi} projectsApi={projectsApi} />}
-      {tab === 'projects' && <ProjectsView projectsApi={projectsApi} tasksApi={tasksApi} />}
+      {tab === 'projects' && (
+        <ProjectsView
+          projectsApi={projectsApi}
+          tasksApi={tasksApi}
+          notesApi={notesApi}
+          onOpenNote={openNote}
+        />
+      )}
       {tab === 'goals' && (
         <GoalsView
           goalsApi={goalsApi}
@@ -58,10 +65,12 @@ function Shell() {
           tagsApi={tagsApi}
           goalsApi={goalsApi}
           tasksApi={tasksApi}
+          projectsApi={projectsApi}
           openNoteId={openNoteId}
           onConsumeOpenNote={() => setOpenNoteId(null)}
           onGoToGoals={() => setTab('goals')}
           onGoToTasks={() => setTab('tasks')}
+          onGoToProjects={() => setTab('projects')}
         />
       )}
       <QuickCapture onSave={notesApi.addNote} />
