@@ -8,6 +8,11 @@ create table if not exists projects (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name        text not null,
+  image_url   text,
+  deadline    date,
+  status      text not null default 'not_started'
+              check (status in ('not_started', 'in_progress', 'done')),
+  sort_order  integer not null default 0,
   archived_at timestamptz,
   created_at  timestamptz not null default now()
 );
@@ -46,6 +51,7 @@ create table if not exists tasks (
   goal_id      uuid references goals (id) on delete set null,
   milestone_id uuid references milestones (id) on delete set null,
   project_id   uuid references projects (id) on delete set null,
+  sort_order   integer not null default 0,
   archived_at  timestamptz,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()

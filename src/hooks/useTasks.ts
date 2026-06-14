@@ -66,5 +66,23 @@ export function useTasks() {
     return { error: null }
   }, [])
 
-  return { tasks, loading, error, refresh, addTask, updateTask, deleteTask }
+  /** Persist a new manual order for the given tasks (used in a project detail). */
+  const reorderTasks = useCallback(
+    async (orderedIds: string[]) => {
+      // Apply new sort_order locally; the main Tasks tab still sorts by due_date,
+      // so this only changes ordering where sort_order is consulted.
+      setTasks((prev) => {
+        const pos = new Map(orderedIds.map((id, i) => [id, i]))
+        return prev.map((t) => (pos.has(t.id) ? { ...t, sort_order: pos.get(t.id)! } : t))
+      })
+      await Promise.all(
+        orderedIds.map((id, i) =>
+          supabase.from('tasks').update({ sort_order: i }).eq('id', id)
+        )
+      )
+    },
+    []
+  )
+
+  return { tasks, loading, error, refresh, addTask, updateTask, deleteTask, reorderTasks }
 }
