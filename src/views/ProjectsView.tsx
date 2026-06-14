@@ -260,7 +260,7 @@ function ProjectDetail({
       <button
         type="button"
         onClick={onBack}
-        className="text-sm text-slate-400 hover:text-white transition-colors"
+        className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium border bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
       >
         ← Projects
       </button>
@@ -402,7 +402,7 @@ function ProjectDetail({
               <button
                 type="button"
                 onClick={() => onOpenNote(note.id)}
-                className="shrink-0 text-xs text-indigo-400 hover:text-indigo-300"
+                className="shrink-0 rounded-lg bg-indigo-500 hover:bg-indigo-400 px-2.5 py-1 text-xs font-medium transition-colors"
               >
                 Open →
               </button>
