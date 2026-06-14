@@ -133,7 +133,7 @@ function NoteList({
                 </div>
               </div>
               {note.body && (
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2 whitespace-pre-wrap">
+                <p className="text-xs text-slate-500 mt-1 line-clamp-2 break-words">
                   {note.body}
                 </p>
               )}
